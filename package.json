@@ -1,11 +1,11 @@
 {
-  "name": "react-avplayer",
+  "name": "react-libmedia",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run post:build",
+    "build": "vite build ",
     "post:build": "tsx ./post-build.ts",
     "lint": "eslint .",
     "start": "vite preview"
@@ -18,7 +18,8 @@
     "@libmedia/cheap": "^0.6.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "tsx": "^4.19.3"
+    "tsx": "^4.19.3",
+    "vite-plugin-static-copy": "^2.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
