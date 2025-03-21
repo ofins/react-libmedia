@@ -47,3 +47,13 @@
   background-color: lightgray;
   border-radius: 1em;
 }
+
+.controls {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  gap: 1em;
+  padding: 1rem;
+  width: 100%;
+  flex-wrap: wrap;
+}

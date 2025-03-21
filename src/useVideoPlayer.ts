@@ -3,14 +3,13 @@ import AVPlayer, { AVPlayerOptions } from "@libmedia/avplayer";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PlayerEventType, PlayerStatus } from "./avplayer.type";
 
-const videoSrc = `${window.location.origin}/mr-rabbit.mp4`;
-
 AVPlayer.setLogLevel(0);
 
 const useVideoPlayer = () => {
   const player = useRef<AVPlayer | null>(null);
 
   const [videoElement, setVideoElement] = useState<HTMLDivElement | null>(null);
+  const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const [init, setInit] = useState(false);
 
   const getPlayerStatus = useCallback((): PlayerStatus | undefined => {
@@ -54,7 +53,7 @@ const useVideoPlayer = () => {
     await player.current?.load(videoSrc);
     await player.current?.play();
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       player.current?.on(PlayerEventType.FIRST_VIDEO_RENDERED, () => {
         resolve();
       });
@@ -78,6 +77,8 @@ const useVideoPlayer = () => {
       loop: true,
     };
 
+    setVideoSrc(`${window.location.origin}/mr-rabbit.mp4`);
+
     player.current = new AVPlayer(options);
     player.current?.setRenderMode(1);
 
@@ -91,15 +92,16 @@ const useVideoPlayer = () => {
       player.current?.destroy();
       player.current = null;
     };
-  }, [videoElement]);
+  }, [videoElement, videoSrc]);
 
   useEffect(() => {
     if (!init) return;
     playVideo();
-  }, [init]);
+  }, [init, videoSrc]);
 
   return {
     setVideoElement,
+    setVideoSrc,
     player,
   };
 };
