@@ -5,18 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && npm run post:build",
+    "post:build": "tsx ./post-build.ts",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "start": "vite preview"
   },
   "dependencies": {
-    "@libmedia/avplayer": "^0.6.0",
     "@libmedia/avcodec": "^0.6.0",
     "@libmedia/avformat": "^0.6.0",
+    "@libmedia/avplayer": "^0.6.0",
     "@libmedia/avutil": "^0.6.0",
     "@libmedia/cheap": "^0.6.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tsx": "^4.19.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

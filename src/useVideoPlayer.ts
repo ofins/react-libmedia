@@ -75,6 +75,7 @@ const useVideoPlayer = () => {
     const options: AVPlayerOptions = {
       wasmBaseUrl: `${window.location.origin}${window.location.pathname}libmedia/wasm`,
       container: videoElement,
+      loop: true,
     };
 
     player.current = new AVPlayer(options);
