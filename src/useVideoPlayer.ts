@@ -1,14 +1,107 @@
 import AVPlayer, { AVPlayerOptions } from "@libmedia/avplayer";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { use, useCallback, useEffect, useRef, useState } from "react";
 import { PlayerEventType, PlayerStatus } from "./avplayer.type";
 
 AVPlayer.setLogLevel(0);
 
 const useVideoPlayer = () => {
   const player = useRef<AVPlayer | null>(null);
+  const preloadPlayer = useRef<AVPlayer | null>(null);
 
   const [videoElement, setVideoElement] = useState<HTMLDivElement | null>(null);
+  const [videoState, setVideoState] = useState({
+    currentSource: "",
+    nextSource: `${window.location.origin}/earth.mp4`,
+    isPreloading: false,
+    isReady: false,
+  });
+
+  const initPreloader = () => {
+    if (!videoElement) return;
+
+    const options: AVPlayerOptions = {
+      wasmBaseUrl: `${window.location.origin}${window.location.pathname}libmedia/wasm`,
+      container: videoElement,
+      loop: true,
+    };
+    preloadPlayer.current = new AVPlayer(options);
+    preloadPlayer.current?.setRenderMode(1);
+    console.log("Preloader initialized", preloadPlayer.current);
+  };
+
+  const preLoadVideoSource = async () => {
+    console.log("Preloading video source", videoState.nextSource);
+    if (!preloadPlayer.current) {
+      initPreloader();
+    }
+
+    setVideoState((prev) => {
+      return {
+        ...prev,
+        isPreloading: true,
+      };
+    });
+
+    await preloadPlayer.current?.load(videoState.nextSource);
+
+    // return new Promise((resolve) => {
+    //   const firstFrameHandler = () => {
+    //     setVideoState((prev) => {
+    //       return {
+    //         ...prev,
+    //         isPreloading: false,
+    //         isReady: true,
+    //       };
+    //     });
+    //   };
+
+    //   preloadPlayer.current?.on(
+    //     PlayerEventType.FIRST_VIDEO_RENDERED,
+    //     firstFrameHandler
+    //   );
+
+    //   resolve(true);
+    // });
+  };
+
+  const swapVideoSource = async () => {
+    const { nextSource, isReady } = videoState;
+    console.log("nextSource", nextSource);
+    console.log("isReady", isReady);
+
+    if (!isReady || !nextSource) {
+      console.warn("Video is not ready or no next source provided");
+    }
+
+    console.log("player", player.current);
+
+    try {
+      player.current?.destroy();
+      player.current = preloadPlayer.current;
+      console.log("Swapping video source", player.current);
+      preloadPlayer.current = null;
+
+      setVideoState((prev) => ({
+        ...prev,
+        currentSource: prev.nextSource,
+        nextSource: "",
+        isReady: false,
+        isPreloading: false,
+      }));
+
+      await player.current?.play();
+    } catch (error) {
+      console.error("Error swapping video source:", error);
+    }
+  };
+
+  const handleNextSource = async () => {
+    initPreloader();
+    await preLoadVideoSource();
+    swapVideoSource();
+  };
+
   const [videoSrc, setVideoSrc] = useState<string | null>(null);
   const [init, setInit] = useState(false);
 
@@ -101,6 +194,7 @@ const useVideoPlayer = () => {
 
   return {
     setVideoElement,
+    handleNextSource,
     setVideoSrc,
     player,
   };
